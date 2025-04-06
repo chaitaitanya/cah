@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0%;
+    }
+
+    #main {
+      margin: 50px;
+      max-width: 100%;
+      height: 100%;
+      border: 2px solid black;
+    }
+
+    #qulity-box {
+      /* width: 100%; */
+      display: flex;
+      flex-direction: row;
+
+    }
+
+    #qulity-box span {
+      width: 50%;
+    }
+
+    #qulity-box #place-location {
+      text-align: end;
+      margin-right: 5px;
+    }
+
+    #qulity-box #qulity-1,
+    #air-aqi {
+      /* text-align: end; */
+      margin-left: 5px;
+    }
+
+
+
+
+
+
+
+    
+  </style>
+</head>
+
+<body>
+  <input type="text" id="location" value="delhi"><button id="search-btn">search</button>
+  <div id="main">
+    <div id="qulity-box">
+      <span id="qulity-1">AIR QULITY</span>
+      <span id="place-location"></span>
+    </div>
+    <hr width="100%">
+    <div id="air-box">
+      <span id="air-aqi"></span>
+      <span id="air-name"></span>
+    </div>
+    <p id="qulity-info"></p>
+
+    <!-- <div id="componentent"> -->
+    <h2 id="comp"></h2>
+    <div id="PM2.5"> 
+    </div>
+    <div id="PM10">
+    </div>
+    <div id="co">
+    </div>
+    <div id="o3">
+    </div>
+    <div id="no2">
+    </div>
+    <div id="so2">
+    </div>
+    <!-- </div> -->
+
+  </div>
+
+</body>
+<script>
+  let aqi = document.getElementById("air-aqi");
+  let airname = document.getElementById("air-name");
+  let info = document.getElementById("qulity-info")
+  let placeName = document.getElementById("place-location");
+
+  const API_URL = 'https://api.waqi.info/feed/';
+  const API_KEY = '629539bb4b78b1604d43bdc506e2eabb1b626727';
+
+  function getData(location) {
+    fetch(`${API_URL}${location}/?token=${API_KEY}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log((data));
+
+        if (data.status === 'ok') {
+          const myString = `${data.data.city.name}`;
+          const words = myString.trim().split(" ");
+          let lastWord = words.length > 0 ? words[words.length - 1] : null;
+
+          placeName.textContent = `${location}, ${lastWord}`
+          let category = getAQICategory(data.data.aqi);
+          let categoryInfo = generateAdvice(category);
+          aqi.textContent = `AQI : ${data.data.aqi}`;
+          airname.textContent = `${category}`
+          info.textContent = `${categoryInfo}`
+
+
+          // component section;
+          document.getElementById("comp").textContent = `All Component`;
+          document.getElementById("PM2.5").innerHTML = `AQI : ${data.data.iaqi.pm25.v} <span>PM2.5(Particular Matter less than 2.5 microns)</span><br><span> ${getAQICategory(data.data.iaqi.pm25.v)}</span>`;
+
+          document.getElementById("PM10").innerHTML = `AQI : ${data.data.iaqi.pm10.v} <span>PM10(Particular Matter less than 10 microns)</span><br><span> ${getAQICategory(data.data.iaqi.pm10.v)}</span>`;
+          // document.getElementById("aqi-full-2").innerHTML="Particular Matter less than 10 microns";
+          document.getElementById("co").innerHTML = `AQI : ${data.data.iaqi.co.v} <span>co(Carbon Monoxide)</span><br><span> ${getAQICategory(data.data.iaqi.co.v)}</span>`;
+          // document.getElementById("aqi-full-3").innerHTML="(Carbon Monoxide)";
+          document.getElementById("o3").innerHTML = `AQI : ${data.data.iaqi.o3.v} <span>PM2.5(Ozone)</span><br><span> ${getAQICategory(data.data.iaqi.o3.v)}</span>`;
+          // document.getElementById("aqi-full-4").innerHTML="(Ozone)";
+          document.getElementById("no2").innerHTML = `AQI : ${data.data.iaqi.no2.v} <span>PM2.5(Nitrogen Dioxide)</span><br><span> ${getAQICategory(data.data.iaqi.no2.v)}</span>`;
+          // document.getElementById("aqi-full-5").innerHTML="(Nitrogen Dioxide)";
+          document.getElementById("so2").innerHTML = `AQI : ${data.data.iaqi.so2.v} <span>PM2.5(Sulphar Dioxide)</span><br><span> ${getAQICategory(data.data.iaqi.so2.v)}</span>`;
+          // document.getElementById("aqi-full-6").innerHTML="(Sulphar Dioxide)";
+
+
+
+        } else {
+          alert('location not found or API error.');
+        }
+      }).catch((err) => {
+        console.log(err);
+
+        alert(err);
+      })
+
+  }
+
+
+  function getAQICategory(aqi) {
+    if (aqi <= 50) return 'Good';
+    if (aqi <= 100) return 'Moderate';
+    if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
+    if (aqi <= 200) return 'Unhealthy';
+    if (aqi <= 300) return 'Very Unhealthy';
+    return 'Hazardous';
+  }
+
+  // function generateAdvice(category) {
+    // switch (category) {
+    //   case 'Good': return 'Air quality is great. Enjoy your day outdoors!';
+    //   case 'Moderate': return 'Air is acceptable. If sensitive, reduce outdoor time.';
+    //   case 'Unhealthy for Sensitive Groups': return 'Avoid strenuous outdoor activities.';
+    //   case 'Unhealthy': return 'Limit time outdoors, especially physical activity.';
+    //   case 'Very Unhealthy': return 'Stay indoors, use air purifiers if possible.';
+    //   case 'Hazardous': return 'Stay indoors and avoid all physical activities outside.';
+    //   default: return 'No specific advice available.';
+    // }
+    
+  // }
+
+  function generateAdvice(category) {
+  switch (category) {
+    case 'Good':
+      return 'Air quality is great. Enjoy your day outdoors! This level of air quality poses little to no risk to health. You can freely engage in outdoor activities like exercise, picnics, or sports.';
+    case 'Moderate':
+      return 'Air is acceptable. If sensitive, reduce outdoor time. Individuals who are unusually sensitive to air pollution may experience mild health effects. Consider shorter outdoor activities.';
+    case 'Unhealthy for Sensitive Groups':
+      return 'Avoid strenuous outdoor activities. Children, elderly people, and those with heart or lung conditions should minimize outdoor exposure. Wearing a mask or using air purifiers can help reduce risk.';
+    case 'Unhealthy':
+      return 'Limit time outdoors, especially physical activity. People may experience significant health effects, especially those in sensitive groups. Avoid prolonged exposure and close windows to reduce indoor pollution.';
+    case 'Very Unhealthy':
+      return 'Stay indoors, use air purifiers if possible. This level indicates serious health effects across the population. Outdoor activities should be avoided altogether, and masks should be considered for necessary outings.';
+    case 'Hazardous':
+      return 'Stay indoors and avoid all physical activities outside. This is the worst air quality category, posing health risks for everyone. Use HEPA air purifiers indoors, monitor local AQI updates, and seek shelter in safe spaces.';
+    default:
+      return 'No specific advice available. Stay informed by monitoring real-time AQI data for your area.';
+  }
+}
+
+
+
+  let place = document.getElementById("location").value;
+  getData(place);
+  document.getElementById("search-btn").addEventListener("click", () => {
+    place = document.getElementById("location").value
+    getData(place)
+  })
+
+
+</script>
+
+</html>
+
+
+
+<!-- <script>
+  // script.js
+const API_URL = 'https://api.waqi.info/feed/';
+const API_KEY = '629539bb4b78b1604d43bdc506e2eabb1b626727';
+
+document.getElementById('search-btn').addEventListener('click', () => {
+const city = document.getElementById('city-input').value.trim();
+if (city) {
+  fetch(`${API_URL}${city}/?token=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        const aqi = data.data.aqi;
+        const category = getAQICategory(aqi);
+        document.getElementById('city-name').textContent = `City: ${data.data.city.name}`;
+        document.getElementById('aqi-value').textContent = `AQI: ${aqi}`;
+        document.getElementById('aqi-category').textContent = `Category: ${category}`;
+        document.getElementById('advice').textContent = generateAdvice(category);
+      } else {
+        alert('City not found or API error.');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+} else {
+  alert('Please enter a city name.');
+}
+});
+
+function getAQICategory(aqi) {
+if (aqi <= 50) return 'Good';
+if (aqi <= 100) return 'Moderate';
+if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
+if (aqi <= 200) return 'Unhealthy';
+if (aqi <= 300) return 'Very Unhealthy';
+return 'Hazardous';
+}
+
+function generateAdvice(category) {
+switch (category) {
+  case 'Good': return 'Air quality is great. Enjoy your day outdoors!';
+  case 'Moderate': return 'Air is acceptable. If sensitive, reduce outdoor time.';
+  case 'Unhealthy for Sensitive Groups': return 'Avoid strenuous outdoor activities.';
+  case 'Unhealthy': return 'Limit time outdoors, especially physical activity.';
+  case 'Very Unhealthy': return 'Stay indoors, use air purifiers if possible.';
+  case 'Hazardous': return 'Stay indoors and avoid all physical activities outside.';
+  default: return 'No specific advice available.';
+}
+}
+</script>
+</html> -->
