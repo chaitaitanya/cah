@@ -1,9 +1,10 @@
    // alert("If the location is not your loction due to location is of your laptop address");
 
    const apiKey = "9e6a15cda1f94d2f9f294103251103"; // Your API key
-   const baseUrl = "http://api.weatherapi.com/v1/current.json";
-   
-   const sunUrl="http://api.weatherapi.com/v1/astronomy.json"
+  
+let baseUrl = "https://api.weatherapi.com/v1/current.json";
+let sunUrl = "https://api.weatherapi.com/v1/astronomy.json";
+
    
    let locationInput = document.getElementById("location");
    const searchButton = document.getElementById("btn");
